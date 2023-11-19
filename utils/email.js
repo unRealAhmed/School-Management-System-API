@@ -1,5 +1,5 @@
-const nodemailer = require('nodemailer');
 const EventEmitter = require('events');
+const nodemailer = require('nodemailer');
 
 const emailEventEmitter = new EventEmitter();
 
