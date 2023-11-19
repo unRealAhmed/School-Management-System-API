@@ -11,6 +11,9 @@ const cookieParser = require('cookie-parser');
 const cors = require("cors");
 const hpp = require('hpp');
 const connectDatabase = require('./utils/dataBase');
+const errorController = require("./controllers/errorController");
+const adminRouter = require('./routes/staff/adminRoutes');
+
 
 // Initialize Express app
 const app = express();
@@ -38,6 +41,10 @@ app.use('/api', rateLimit({
   message: 'Too many requests from this IP, please try again in an hour!'
 }));
 
+//ROUTES
+
+app.use('/api/v1/admins', adminRouter)
+
 // Connect to the database
 connectDatabase();
 
@@ -49,6 +56,8 @@ app.all("*", (req, _, next) => {
   err.isOperational = true;
   next(err);
 });
+
+app.use(errorController)
 
 // Start the server and listen on the defined port
 app.listen(port, () => {
