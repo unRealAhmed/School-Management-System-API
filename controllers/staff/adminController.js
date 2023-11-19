@@ -167,3 +167,69 @@ exports.getAllAdmins = asyncHandler(async (req, res, next) => {
     admins
   })
 })
+
+const filterObj = (obj, ...allowedFields) => {
+  const newObj = {};
+  Object.keys(obj).forEach(el => {
+    // If the property is in the list of allowed fields, add it to the new object
+    if (allowedFields.includes(el)) {
+      newObj[el] = obj[el];
+    }
+  });
+  return newObj;
+};
+
+// Update user data except for password
+exports.updateAdminData = asyncHandler(async (req, res, next) => {
+  // 1) Check if the request includes password-related fields; if so, disallow updates
+  if (req.body.password || req.body.passwordConfirm) {
+    return next(
+      new AppError(
+        'This route is not for password updates. Please use /update Admin Password.',
+        400
+      )
+    );
+  }
+
+  // 2) Filter out any unwanted fields that should not be updated
+  const filteredBody = filterObj(req.body, 'name', 'email');
+
+  const updatedadmin = await Admin.findByIdAndUpdate(req.user.id, filteredBody, {
+    new: true,
+    runValidators: true
+  });
+
+  res.status(200).json({
+    status: 'success',
+    updatedadmin
+  });
+});
+
+//UPDATE PASSWORD
+exports.updateAdminPassword = asyncHandler(async (req, res, next) => {
+
+  const { oldPassword, newPassword } = req.body;
+  if (!oldPassword || !newPassword) {
+    return next(new AppError('Please provide both values', 400))
+  }
+
+  // 1) Find the admin by ID and select the password field
+  const admin = await Admin.findById(req.user._id).select("+password");
+  // 2) Check if the entered current password is correct
+  const isPasswordCorrect = await admin.passwordMatching(
+    oldPassword,
+    admin.password
+  );
+
+  if (!isPasswordCorrect) {
+    return next(new AppError("Your current password is incorrect", 401));
+  }
+  // 3) Update the admin's password with the new one and save the changes
+  admin.password = req.body.newPassword;
+  admin.passwordConfirm = req.body.passwordConfirm;
+  await admin.save();
+
+  admin.password = undefined;
+
+  sendTokenResponse(res, admin, 200);
+});
