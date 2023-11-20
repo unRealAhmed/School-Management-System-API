@@ -13,6 +13,10 @@ const hpp = require('hpp');
 const connectDatabase = require('./utils/dataBase');
 const errorController = require("./controllers/errorController");
 const adminRouter = require('./routes/staff/adminRoutes');
+const academicYearRouteR = require('./routes/Academic/academicYearRoutes');
+const academicTermRouter = require('./routes/Academic/academicTermRoutes');
+
+
 
 
 // Initialize Express app
@@ -44,6 +48,8 @@ app.use('/api', rateLimit({
 //ROUTES
 
 app.use('/api/v1/admins', adminRouter)
+app.use('/api/v1/academic-years', academicYearRouteR)
+app.use('/api/v1/academic-terms', academicTermRouter)
 
 // Connect to the database
 connectDatabase();
