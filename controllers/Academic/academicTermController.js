@@ -20,7 +20,7 @@ exports.createAcademicTerm = asyncHandler(async (req, res, next) => {
     createdBy
   });
   //push academic into admin
-  const admin = await Admin.findById(req.user.id);
+  const admin = await Admin.findById(createdBy);
   admin.academicTerms.push(newAcademicTerm.id);
   await admin.save({ validateBeforeSave: false });
   res.status(201).json({
