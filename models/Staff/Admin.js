@@ -106,16 +106,6 @@ adminSchema.methods.changedPasswordAfter = function (tokenIssuedAt) {
   return false;
 };
 
-//PASSWORD CHANGE CHECKER
-adminSchema.methods.changedPasswordAfter = function (tokenIssuedAt) {
-  if (this.passwordChangedAt) {
-    // Convert passwordChangedAt timestamp to seconds
-    const changedTimestamp = this.passwordChangedAt.getTime() / 1000;
-    return tokenIssuedAt < changedTimestamp;
-  }
-  return false;
-};
-
 // HASH PASSWORD before saving the user
 adminSchema.pre('save', async function (next) {
   // Check if the password field has been modified
