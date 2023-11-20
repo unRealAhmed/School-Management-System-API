@@ -16,6 +16,9 @@ const adminRouter = require('./routes/staff/adminRoutes');
 const academicYearRouteR = require('./routes/Academic/academicYearRoutes');
 const academicTermRouter = require('./routes/Academic/academicTermRoutes');
 const classLevelRouter = require('./routes/Academic/classLevelRoutes');
+const programRouter = require('./routes/Academic/programRoutes');
+const subjectRouter = require('./routes/Academic/subjectRoutes');
+const yearGroupRouter = require('./routes/Academic/yearGroupRoutes');
 
 // Initialize Express app
 const app = express();
@@ -49,6 +52,9 @@ app.use('/api/v1/admins', adminRouter)
 app.use('/api/v1/academic-years', academicYearRouteR)
 app.use('/api/v1/academic-terms', academicTermRouter)
 app.use('/api/v1/class-levels', classLevelRouter)
+app.use('/api/v1/programs', programRouter)
+app.use('/api/v1/subjects', subjectRouter)
+app.use('/api/v1/year-groups', yearGroupRouter)
 
 // Connect to the database
 connectDatabase();
