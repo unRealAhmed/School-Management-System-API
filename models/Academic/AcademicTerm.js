@@ -13,7 +13,6 @@ const academicTermSchema = new mongoose.Schema(
     },
     duration: {
       type: String,
-      required: [true, "Academic term duration is required."],
       default: "3 months",
     },
 
