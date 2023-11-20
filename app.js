@@ -15,9 +15,7 @@ const errorController = require("./controllers/errorController");
 const adminRouter = require('./routes/staff/adminRoutes');
 const academicYearRouteR = require('./routes/Academic/academicYearRoutes');
 const academicTermRouter = require('./routes/Academic/academicTermRoutes');
-
-
-
+const classLevelRouter = require('./routes/Academic/classLevelRoutes');
 
 // Initialize Express app
 const app = express();
@@ -50,6 +48,7 @@ app.use('/api', rateLimit({
 app.use('/api/v1/admins', adminRouter)
 app.use('/api/v1/academic-years', academicYearRouteR)
 app.use('/api/v1/academic-terms', academicTermRouter)
+app.use('/api/v1/class-levels', classLevelRouter)
 
 // Connect to the database
 connectDatabase();
