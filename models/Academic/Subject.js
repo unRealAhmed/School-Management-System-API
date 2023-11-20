@@ -31,7 +31,6 @@ const subjectSchema = new mongoose.Schema(
     // Duration
     duration: {
       type: String,
-      required: [true, "Subject duration is required."],
       default: "3 months",
     },
   },
