@@ -11,6 +11,6 @@ router.use(protect, restrictTo('admin'))
 router.route('/').get(getAllAdmins)
 router.route('/:id').get(getAdminProfile)
 router.route('/updateAdmin').patch(updateAdminData)
-router.route('/updateAdminPassword').patch(updateAdminPassword)
+router.route('/updateMyPassword').patch(updateAdminPassword)
 
 module.exports = router
