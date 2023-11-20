@@ -13,7 +13,6 @@ const programSchema = new mongoose.Schema(
     },
     duration: {
       type: String,
-      required: [true, "Program duration is required."],
       default: "4 years",
     },
 
