@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const bcrypt = require('bcryptjs');
 const { default: validator } = require("validator");
 
 const teacherSchema = new mongoose.Schema(
@@ -31,6 +32,9 @@ const teacherSchema = new mongoose.Schema(
         message: "Passwords are not the same!",
       },
     },
+    passwordChangedAt: Date,
+    passwordResetToken: String,
+    passwordResetExpires: Date,
     dateEmployed: {
       type: Date,
       default: Date.now,
@@ -39,7 +43,6 @@ const teacherSchema = new mongoose.Schema(
     // Unique Identifier
     teacherId: {
       type: String,
-      required: [true, "Teacher ID is required."],
       default: function () {
         return (
           `TEA${Math.floor(100 + Math.random() * 900)}${Date.now().toString().slice(2, 4)}${this.name
@@ -69,7 +72,6 @@ const teacherSchema = new mongoose.Schema(
     subject: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Subject",
-      required: [true, "Subject is required."],
     },
     applicationStatus: {
       type: String,
@@ -109,6 +111,43 @@ const teacherSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+// COMPARING PASSWORDS
+teacherSchema.methods.passwordMatching = async function (enteredPassword, userPassword) {
+  return await bcrypt.compare(enteredPassword, userPassword);
+};
+
+// HASH PASSWORD before saving the user
+teacherSchema.pre('save', async function (next) {
+  // Check if the password field has been modified
+  if (!this.isModified('password')) return next();
+
+  try {
+    // Generate a salt with a cost factor of 12
+    const salt = await bcrypt.genSalt(12);
+    this.password = await bcrypt.hash(this.password, salt);
+
+    // Set passwordConfirm to undefined as it's no longer needed
+    this.passwordConfirm = undefined;
+
+    // Update passwordChangedAt if it's not a new user
+    if (!this.isNew) this.passwordChangedAt = Date.now() - 1000;
+
+    next();
+  } catch (error) {
+    return next(error);
+  }
+});
+
+// PASSWORD CHANGE CHECK
+teacherSchema.methods.changedPasswordAfter = function (tokenIssuedAt) {
+  if (this.passwordChangedAt) {
+    // Convert passwordChangedAt timestamp to seconds
+    const changedTimestamp = this.passwordChangedAt.getTime() / 1000;
+    return tokenIssuedAt < changedTimestamp;
+  }
+  return false;
+};
 
 // Model
 const Teacher = mongoose.model("Teacher", teacherSchema);
