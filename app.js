@@ -14,6 +14,7 @@ const connectDatabase = require('./utils/dataBase');
 const errorController = require("./controllers/errorController");
 const adminRouter = require('./routes/staff/adminRoutes');
 const teacherRouter = require('./routes/staff/teacherRoutes');
+const studentRouter = require('./routes/Academic/studentRoutes');
 const academicYearRouteR = require('./routes/Academic/academicYearRoutes');
 const academicTermRouter = require('./routes/Academic/academicTermRoutes');
 const classLevelRouter = require('./routes/Academic/classLevelRoutes');
@@ -52,6 +53,7 @@ app.use('/api', rateLimit({
 
 app.use('/api/v1/admins', adminRouter)
 app.use('/api/v1/teachers', teacherRouter)
+app.use('/api/v1/students', studentRouter)
 app.use('/api/v1/academic-years', academicYearRouteR)
 app.use('/api/v1/academic-terms', academicTermRouter)
 app.use('/api/v1/class-levels', classLevelRouter)
