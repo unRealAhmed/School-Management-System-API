@@ -6,12 +6,19 @@ The Node.js School Management System API is a robust and comprehensive solution 
 
 ## Table of Contents
 
+- [Postman Collection](#postman-collection)
 - [Features](#features)
 - [Prerequisites](#prerequisites)
 - [Usage](#usage)
 - [API Endpoints](#api-endpoints)
 - [Authentication](#authentication)
 - [GitHub Repository](#github-repository)
+
+## Postman Collection
+
+You can test the API using the [Postman collection](https://www.postman.com/mission-cosmonaut-25659827/workspace/school-management-system/collection/26177748-05a5d822-a456-413b-a95c-4a7e1aae7c0b?action=share&creator=26177748&active-environment=26177748-a365b933-8cbc-42a5-95b7-8f55387fba00) provided.
+
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://www.postman.com/mission-cosmonaut-25659827/workspace/school-management-system/collection/26177748-05a5d822-a456-413b-a95c-4a7e1aae7c0b?action=share&creator=26177748&active-environment=26177748-a365b933-8cbc-42a5-95b7-8f55387fba00)
 
 ## Features
 
@@ -42,7 +49,7 @@ The Node.js School Management System API is a robust and comprehensive solution 
 
 - **Documentation:**
 
-  - Detailed API documentation available in the [API Documentation] and (API_DOCUMENTATION.html) file.
+  - Detailed API documentation available in the [API Documentation](documentation.html) file.
 
 - **Error Handling:**
 
