@@ -93,6 +93,18 @@ const examSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+examSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'questions',
+    select: '-createdAt -updatedAt',
+    populate: {
+      path: 'createdBy',
+      select: 'name'
+    }
+  })
+  next()
+})
+
 // Model
 const Exam = mongoose.model("Exam", examSchema);
 
