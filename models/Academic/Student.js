@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { default: validator } = require("validator");
+const bcrypt = require('bcryptjs');
 
 const studentSchema = new mongoose.Schema(
   {
@@ -31,6 +32,9 @@ const studentSchema = new mongoose.Schema(
         message: "Passwords are not the same!",
       },
     },
+    passwordChangedAt: Date,
+    passwordResetToken: String,
+    passwordResetExpires: Date,
     // Unique Identifier
     studentId: {
       type: String,
@@ -128,6 +132,43 @@ const studentSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+// COMPARING PASSWORDS
+studentSchema.methods.passwordMatching = async function (enteredPassword, userPassword) {
+  return await bcrypt.compare(enteredPassword, userPassword);
+};
+
+// HASH PASSWORD before saving the user
+studentSchema.pre('save', async function (next) {
+  // Check if the password field has been modified
+  if (!this.isModified('password')) return next();
+
+  try {
+    // Generate a salt with a cost factor of 12
+    const salt = await bcrypt.genSalt(12);
+    this.password = await bcrypt.hash(this.password, salt);
+
+    // Set passwordConfirm to undefined as it's no longer needed
+    this.passwordConfirm = undefined;
+
+    // Update passwordChangedAt if it's not a new user
+    if (!this.isNew) this.passwordChangedAt = Date.now() - 1000;
+
+    next();
+  } catch (error) {
+    return next(error);
+  }
+});
+
+// PASSWORD CHANGE CHECK
+studentSchema.methods.changedPasswordAfter = function (tokenIssuedAt) {
+  if (this.passwordChangedAt) {
+    // Convert passwordChangedAt timestamp to seconds
+    const changedTimestamp = this.passwordChangedAt.getTime() / 1000;
+    return tokenIssuedAt < changedTimestamp;
+  }
+  return false;
+};
 
 // Model
 const Student = mongoose.model("Student", studentSchema);
