@@ -2,11 +2,17 @@ const Admin = require("../../models/Staff/Admin");
 const asyncHandler = require("../../utils/asyncHandler");
 const Subject = require("../../models/Academic/Subject");
 const AppError = require("../../utils/appErrors");
+const Program = require("../../models/Academic/Program");
 
 
 exports.createSubject = asyncHandler(async (req, res, next) => {
   const { name, description, academicTerm } = req.body;
   const createdBy = req.user.id
+  //find the program
+  const programFound = await Program.findById(req.params.programId);
+  if (!programFound) {
+    return next(new AppError("Program  not found", 404))
+  }
   //check if exists
   const subjectFound = await Subject.findOne({ name });
   if (subjectFound) {

@@ -14,7 +14,6 @@ const examResultSchema = new mongoose.Schema(
       ref: "Exam",
       required: [true, "Exam is required."],
     },
-
     // Result Details
     grade: {
       type: Number,
@@ -32,8 +31,8 @@ const examResultSchema = new mongoose.Schema(
     status: {
       type: String,
       required: [true, "Status is required."],
-      enum: ["failed", "passed"],
-      default: "failed",
+      enum: ["Fail", "Pass"],
+      default: "Fail",
     },
     remarks: {
       type: String,
@@ -41,11 +40,6 @@ const examResultSchema = new mongoose.Schema(
       enum: ["Excellent", "Good", "Poor"],
       default: "Poor",
     },
-    position: {
-      type: Number,
-      required: [true, "Position is required."],
-    },
-
     // Subject and Class Information
     subject: {
       type: mongoose.Schema.Types.ObjectId,
