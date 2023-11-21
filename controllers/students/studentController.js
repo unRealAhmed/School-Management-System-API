@@ -167,48 +167,51 @@ exports.updateStudentPassword = asyncHandler(async (req, res, next) => {
 });
 
 exports.adminUpdateStudent = asyncHandler(async (req, res, next) => {
-  // Destructure request body and parameters
-  const { classLevels, academicYear, program, name, email, prefectName } = req.body;
-  const { studentId } = req.params;
-
-  // Find the student by ID
-  const studentFound = await Student.findById(studentId);
-  if (!studentFound) {
-    return next(new AppError('Student not found', 404));
-  }
-
-  // Update the student
-  const studentUpdate = {
-    name,
-    email,
+  const {
+    classLevels,
     academicYear,
     program,
+    name,
+    email,
     prefectName,
-  };
+    isSuspended,
+    isWithdrawn,
+  } = req.body;
 
-  // Add classLevels to the student using $addToSet
-  if (classLevels && Array.isArray(classLevels) && classLevels.length > 0) {
-    studentUpdate.$addToSet = {
-      classLevels: { $each: classLevels },
-    };
+  //find the student by id
+  const studentFound = await Student.findById(req.params.studentId);
+  if (!studentFound) {
+    return next(new AppError("Student not found"))
   }
 
-  // Execute the update query
-  const updatedStudent = await Student.findByIdAndUpdate(
-    studentId,
-    { $set: studentUpdate },
+  //update
+  const studentUpdated = await Student.findByIdAndUpdate(
+    req.params.studentId,
+    {
+      $set: {
+        name,
+        email,
+        academicYear,
+        program,
+        prefectName,
+        isSuspended,
+        isWithdrawn,
+      },
+      $addToSet: {
+        classLevels,
+      },
+    },
     {
       new: true,
-      runValidators: true,
     }
   );
-
-  // Send response
+  //send response
   res.status(200).json({
-    status: 'success',
-    studentUpdated: updatedStudent,
+    status: "success",
+    studentUpdated,
   });
 });
+
 
 exports.writeExam = asyncHandler(async (req, res, next) => {
   //get student
@@ -312,53 +315,60 @@ exports.writeExam = asyncHandler(async (req, res, next) => {
   // //save
   await studentFound.save({ validateBeforeSave: false });
 
+  //Promoting
+  //promote student to level 200
+  if (
+    examFound.academicTerm.name === "3th Term" &&
+    status === "Pass" &&
+    studentFound?.currentClassLevel === "Level 100"
+  ) {
+    studentFound.classLevels.push("Level 200");
+    studentFound.currentClassLevel = "Level 200";
+    studentFound.isPromotedToLevel200 = true;
+    await studentFound.save({ validateBeforeSave: false });
+    return
+  }
+
+  //promote student to level 300
+  if (
+    examFound.academicTerm.name === "3th Term" &&
+    status === "Pass" &&
+    studentFound?.currentClassLevel === "Level 200"
+  ) {
+    studentFound.classLevels.push("Level 300");
+    studentFound.currentClassLevel = "Level 300";
+    studentFound.isPromotedToLevel300 = true
+    await studentFound.save({ validateBeforeSave: false });
+    return
+  }
+
+  //promote student to level 400
+  if (
+    examFound.academicTerm.name === "3th Term" &&
+    status === "Pass" &&
+    studentFound?.currentClassLevel === "Level 300"
+  ) {
+    studentFound.classLevels.push("Level 400");
+    studentFound.currentClassLevel = "Level 400";
+    studentFound.isPromotedToLevel400 = true
+    await studentFound.save({ validateBeforeSave: false });
+    return
+  }
+
+  //promote student to graduate
+  if (
+    examFound.academicTerm.name === "3th Term" &&
+    status === "Pass" &&
+    studentFound?.currentClassLevel === "Level 400"
+  ) {
+    studentFound.isGraduated = true;
+    studentFound.yearGraduated = new Date();
+    await studentFound.save({ validateBeforeSave: false });
+    return
+  }
+
   res.status(200).json({
     status: "success",
-    examResults
   });
 });
 
-// //Promoting
-// //promote student to level 200
-// if (
-//   examFound.academicTerm.name === "3rd term" &&
-//   status === "Pass" &&
-//   studentFound?.currentClassLevel === "Level 100"
-// ) {
-//   studentFound.classLevels.push("Level 200");
-//   studentFound.currentClassLevel = "Level 200";
-//   await studentFound.save();
-// }
-
-// //promote student to level 300
-// if (
-//   examFound.academicTerm.name === "3rd term" &&
-//   status === "Pass" &&
-//   studentFound?.currentClassLevel === "Level 200"
-// ) {
-//   studentFound.classLevels.push("Level 300");
-//   studentFound.currentClassLevel = "Level 300";
-//   await studentFound.save();
-// }
-
-// //promote student to level 400
-// if (
-//   examFound.academicTerm.name === "3rd term" &&
-//   status === "Pass" &&
-//   studentFound?.currentClassLevel === "Level 300"
-// ) {
-//   studentFound.classLevels.push("Level 400");
-//   studentFound.currentClassLevel = "Level 400";
-//   await studentFound.save();
-// }
-
-// //promote student to graduate
-// if (
-//   examFound.academicTerm.name === "3rd term" &&
-//   status === "Pass" &&
-//   studentFound?.currentClassLevel === "Level 400"
-// ) {
-//   studentFound.isGraduated = true;
-//   studentFound.yearGraduated = new Date();
-//   await studentFound.save();
-// }
