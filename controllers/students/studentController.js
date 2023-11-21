@@ -210,46 +210,45 @@ exports.adminUpdateStudent = asyncHandler(async (req, res, next) => {
   });
 });
 
-exports.writeExam = asyncHandler(async (req, res) => {
+exports.writeExam = asyncHandler(async (req, res, next) => {
   //get student
-  const studentFound = await Student.findById(req.userAuth?._id);
+  const studentFound = await Student.findById(req.user.id);
   if (!studentFound) {
-    throw new Error("Student not found");
+    return next(new AppError("Student not found"))
   }
   //Get exam
-  const examFound = await Exam.findById(req.params.examID)
+  const examFound = await Exam.findById(req.params.examId)
     .populate("questions")
     .populate("academicTerm");
 
   if (!examFound) {
-    throw new Error("Exam not found");
+    return (new AppError("Exam not found"))
   }
   //get questions
-  const questions = examFound?.questions;
+  const { questions } = examFound;
   //get students questions
   const studentAnswers = req.body.answers;
 
   //check if student answered all questions
   if (studentAnswers.length !== questions.length) {
-    throw new Error("You have not answered all the questions");
+    return next(new AppError("You have not answered all the questions"))
   }
 
   // //check if student has already taken the exams
   const studentFoundInResults = await ExamResult.findOne({
-    student: studentFound?._id,
+    student: studentFound.id,
   });
   if (studentFoundInResults) {
-    throw new Error("You have already written this exam");
+    return next(new AppError("You have already written this exam"))
   }
 
   //check if student is suspende/withdrawn
   if (studentFound.isWithdrawn || studentFound.isSuspended) {
-    throw new Error("You are suspended/withdrawn, you can't take this exam");
+    return next(new AppError("You are suspended/withdrawn, you can't take this exam"))
   }
 
   //Build report object
   let correctanswers = 0;
-  let wrongAnswers = 0;
   let status = ""; //failed/passed
   let grade = 0;
   let remarks = "";
@@ -265,17 +264,14 @@ exports.writeExam = asyncHandler(async (req, res) => {
       correctanswers += 1;
       score += 1;
       question.isCorrect = true;
-    } else {
-      wrongAnswers += 1;
     }
   }
   //calculate reports
-  const totalQuestions = questions.length;
   grade = (correctanswers / questions.length) * 100;
-  answeredQuestions = questions.map(question => ({
-    question: question.question,
-    correctanswer: question.correctAnswer,
-    isCorrect: question.isCorrect,
+  answeredQuestions = questions.map(({ question, correctAnswer, isCorrect }) => ({
+    question,
+    correctAnswer,
+    isCorrect,
   }));
 
   //calculate status
@@ -300,69 +296,69 @@ exports.writeExam = asyncHandler(async (req, res) => {
 
   //Generate Exam results
   const examResults = await ExamResult.create({
-    studentID: studentFound?.studentId,
-    exam: examFound?._id,
+    student: studentFound.id,
+    exam: examFound.id,
     grade,
     score,
     status,
     remarks,
-    classLevel: examFound?.classLevel,
-    academicTerm: examFound?.academicTerm,
-    academicYear: examFound?.academicYear,
+    classLevel: examFound.classLevel,
+    academicTerm: examFound.academicTerm,
+    academicYear: examFound.academicYear,
     answeredQuestions: answeredQuestions,
   });
   // //push the results into
-  studentFound.examResults.push(examResults?._id);
+  studentFound.examResults.push(examResults.id);
   // //save
-  await studentFound.save();
-
-  //Promoting
-  //promote student to level 200
-  if (
-    examFound.academicTerm.name === "3rd term" &&
-    status === "Pass" &&
-    studentFound?.currentClassLevel === "Level 100"
-  ) {
-    studentFound.classLevels.push("Level 200");
-    studentFound.currentClassLevel = "Level 200";
-    await studentFound.save();
-  }
-
-  //promote student to level 300
-  if (
-    examFound.academicTerm.name === "3rd term" &&
-    status === "Pass" &&
-    studentFound?.currentClassLevel === "Level 200"
-  ) {
-    studentFound.classLevels.push("Level 300");
-    studentFound.currentClassLevel = "Level 300";
-    await studentFound.save();
-  }
-
-  //promote student to level 400
-  if (
-    examFound.academicTerm.name === "3rd term" &&
-    status === "Pass" &&
-    studentFound?.currentClassLevel === "Level 300"
-  ) {
-    studentFound.classLevels.push("Level 400");
-    studentFound.currentClassLevel = "Level 400";
-    await studentFound.save();
-  }
-
-  //promote student to graduate
-  if (
-    examFound.academicTerm.name === "3rd term" &&
-    status === "Pass" &&
-    studentFound?.currentClassLevel === "Level 400"
-  ) {
-    studentFound.isGraduated = true;
-    studentFound.yearGraduated = new Date();
-    await studentFound.save();
-  }
+  await studentFound.save({ validateBeforeSave: false });
 
   res.status(200).json({
     status: "success",
-    data: "You have submitted your exam. Check later for the results",
+    examResults
   });
 });
+
+// //Promoting
+// //promote student to level 200
+// if (
+//   examFound.academicTerm.name === "3rd term" &&
+//   status === "Pass" &&
+//   studentFound?.currentClassLevel === "Level 100"
+// ) {
+//   studentFound.classLevels.push("Level 200");
+//   studentFound.currentClassLevel = "Level 200";
+//   await studentFound.save();
+// }
+
+// //promote student to level 300
+// if (
+//   examFound.academicTerm.name === "3rd term" &&
+//   status === "Pass" &&
+//   studentFound?.currentClassLevel === "Level 200"
+// ) {
+//   studentFound.classLevels.push("Level 300");
+//   studentFound.currentClassLevel = "Level 300";
+//   await studentFound.save();
+// }
+
+// //promote student to level 400
+// if (
+//   examFound.academicTerm.name === "3rd term" &&
+//   status === "Pass" &&
+//   studentFound?.currentClassLevel === "Level 300"
+// ) {
+//   studentFound.classLevels.push("Level 400");
+//   studentFound.currentClassLevel = "Level 400";
+//   await studentFound.save();
+// }
+
+// //promote student to graduate
+// if (
+//   examFound.academicTerm.name === "3rd term" &&
+//   status === "Pass" &&
+//   studentFound?.currentClassLevel === "Level 400"
+// ) {
+//   studentFound.isGraduated = true;
+//   studentFound.yearGraduated = new Date();
+//   await studentFound.save();
+// }

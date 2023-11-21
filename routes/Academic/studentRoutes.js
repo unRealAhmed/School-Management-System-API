@@ -8,6 +8,7 @@ const {
   updateStudentData,
   updateStudentPassword,
   adminUpdateStudent,
+  writeExam
 } = require("../../controllers/students/studentController");
 
 const { protect, restrictTo } = require("../../controllers/staff/adminController");
@@ -24,6 +25,7 @@ router.use(protect); // Middleware for authentication
 router.patch("/updateMyPassword", restrictTo("student"), updateStudentPassword);
 router.get("/profile", restrictTo("student"), getStudentProfile);
 router.patch("/:studentId/update", restrictTo("student"), updateStudentData);
+router.post("/exam/:examId/write", restrictTo("student"), writeExam);
 
 // Admin routes
 router.post("/signup-student", restrictTo("admin"), adminRegisterStudent);
