@@ -14,9 +14,9 @@ const router = express.Router();
 router.use(protect, restrictTo('admin'));
 
 // Routes for handling subject operations
-router.route("/")
-  .post(createSubject)
-  .get(getAllSubjects);
+
+router.post("/:programId", createSubject)
+router.get('/', getAllSubjects)
 
 router.route("/:id")
   .get(getSubject)
