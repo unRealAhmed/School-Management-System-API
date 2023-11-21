@@ -10,6 +10,7 @@ const xss = require("xss-clean");
 const cookieParser = require('cookie-parser');
 const cors = require("cors");
 const hpp = require('hpp');
+const compression = require("compression");
 const connectDatabase = require('./utils/dataBase');
 const errorController = require("./controllers/errorController");
 const adminRouter = require('./routes/staff/adminRoutes');
@@ -34,6 +35,7 @@ app.use(helmet()); // Set various HTTP headers for security
 app.use(mongoSanitize()); // Sanitize data against NoSQL injection attacks
 app.use(xss()); // Prevent XSS attacks
 app.use(hpp());
+app.use(compression());
 
 // Parse cookies, enable CORS, and handle JSON parsing
 app.use(cookieParser(process.env.JWT_SECRET_KEY));

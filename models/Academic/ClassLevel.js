@@ -1,5 +1,7 @@
+// Import mongoose
 const mongoose = require("mongoose");
 
+// Define ClassLevel schema
 const classLevelSchema = new mongoose.Schema(
   {
     // Basic Information
@@ -39,7 +41,15 @@ const classLevelSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Indexes
+classLevelSchema.index({ name: 1 });
+classLevelSchema.index({ createdBy: 1, createdAt: -1 });
+classLevelSchema.index({ "students": 1 });
+classLevelSchema.index({ "subjects": 1 });
+classLevelSchema.index({ "teachers": 1 });
+
 // Model
 const ClassLevel = mongoose.model("ClassLevel", classLevelSchema);
 
+// Export the model
 module.exports = ClassLevel;
