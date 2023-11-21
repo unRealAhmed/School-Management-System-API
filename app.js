@@ -23,6 +23,7 @@ const subjectRouter = require('./routes/Academic/subjectRoutes');
 const yearGroupRouter = require('./routes/Academic/yearGroupRoutes');
 const examRouter = require('./routes/Academic/examRoutes');
 const questionRouter = require('./routes/Academic/questionRoutes');
+const examResultsRouter = require('./routes/Academic/examReusltsRoutes');
 
 // Initialize Express app
 const app = express();
@@ -63,6 +64,7 @@ app.use('/api/v1/subjects', subjectRouter)
 app.use('/api/v1/year-groups', yearGroupRouter)
 app.use('/api/v1/exams', examRouter)
 app.use('/api/v1/questions', questionRouter)
+app.use('/api/v1/exam-results', examResultsRouter)
 
 // Connect to the database
 connectDatabase();
