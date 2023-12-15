@@ -8,7 +8,7 @@ const {
   deleteSubject
 } = require("../../controllers/Academic/subjectsController");
 
-const { validationFunction } = require('../../middleware/validationFunction');
+const validationFunction = require('../../middleware/validationFunction');
 const { subjectValidationSchema, subjectUpdateSchema } = require('../../validation/academics/subjectValidation');
 
 const router = express.Router();

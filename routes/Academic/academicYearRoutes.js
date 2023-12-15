@@ -1,26 +1,28 @@
 const express = require('express');
 const { protect, restrictTo } = require('../../controllers/staff/adminController');
 const {
-  createAcademicYear,
+  CreateAcademicYear,
   getAllAcademicYears,
   getAcademicYear,
   updateAcademicYear,
   deleteAcademicYear,
 } = require('../../controllers/Academic/academicYearController');
 const { academicYearValidationSchema, academicYearUpdateSchema } = require('../../validation/academics/academicYearValidation');
-const validate = require('../../middleware/validationFunction');
+const validationFunction = require('../../middleware/validationFunction');
 
 const router = express.Router();
 
 router.use(protect, restrictTo('admin'));
 
-router.route('/')
+router
+  .route('/')
   .get(getAllAcademicYears)
-  .post(validate(academicYearValidationSchema), createAcademicYear);
+  .post(validationFunction(academicYearValidationSchema), CreateAcademicYear);
 
-router.route('/:id')
+router
+  .route('/:id')
   .get(getAcademicYear)
-  .patch(validate(academicYearUpdateSchema), updateAcademicYear)
+  .patch(validationFunction(academicYearUpdateSchema), updateAcademicYear)
   .delete(deleteAcademicYear);
 
 module.exports = router;

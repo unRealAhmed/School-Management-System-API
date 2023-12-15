@@ -1,4 +1,4 @@
-const ValidationError = require('../util/validationError');
+const ValidationError = require('../utils/validationError');
 
 const validationMiddleware = (validationSchema) => (req, res, next) => {
   const { error } = validationSchema.validate(req.body);

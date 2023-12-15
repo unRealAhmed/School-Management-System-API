@@ -3,8 +3,6 @@ const asyncHandler = require('../../utils/asyncHandler')
 const AppError = require('../../utils/appErrors')
 const Admin = require('../../models/Staff/Admin')
 
-
-
 exports.CreateAcademicYear = asyncHandler(async (req, res, next) => {
   const { name, fromYear, toYear } = req.body
   const createdBy = req.user.id
