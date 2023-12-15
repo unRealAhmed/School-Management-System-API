@@ -7,12 +7,16 @@ const {
   updateQuestion,
 } = require("../../controllers/Academic/questionsController");
 
+const { questionValidationSchema, questionUpdateSchema } = require("../../validation/academics/questionsValidation");
+
+const validationFunction = require('../../middleware/validationFunction');
+
 const router = express.Router();
 
-router.use(protect, restrictTo('teacher'))
+router.use(protect, restrictTo('teacher'));
 
-router.post("/:examId", createQuestion);
+router.post("/:examId", validationFunction(questionValidationSchema), createQuestion);
 router.get("/", getAllQuestions);
-router.route('/:id').get(getQuestion).patch(updateQuestion);
+router.route('/:id').get(getQuestion).patch(validationFunction(questionUpdateSchema), updateQuestion);
 
 module.exports = router;

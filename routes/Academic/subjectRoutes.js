@@ -8,19 +8,19 @@ const {
   deleteSubject
 } = require("../../controllers/Academic/subjectsController");
 
+const { validationFunction } = require('../../middleware/validationFunction');
+const { subjectValidationSchema, subjectUpdateSchema } = require('../../validation/academics/subjectValidation');
+
 const router = express.Router();
 
-// Middleware for protecting and restricting routes
 router.use(protect, restrictTo('admin'));
 
-// Routes for handling subject operations
-
-router.post("/:programId", createSubject)
-router.get('/', getAllSubjects)
+router.post("/:programId", validationFunction(subjectValidationSchema), createSubject);
+router.get('/', getAllSubjects);
 
 router.route("/:id")
   .get(getSubject)
-  .patch(updateSubject)
+  .patch(validationFunction(subjectUpdateSchema), updateSubject)
   .delete(deleteSubject);
 
 module.exports = router;

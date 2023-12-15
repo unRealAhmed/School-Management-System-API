@@ -8,19 +8,20 @@ const {
   deleteYearGroup
 } = require("../../controllers/Academic/yearGroupsController");
 
+const validationFunction = require('../../middleware/validationFunction');
+const { yearGroupValidationSchema, yearGroupUpdateSchema } = require('../../validation/academics/yearGroupValidation');
+
 const router = express.Router();
 
-// Middleware for protecting and restricting routes
 router.use(protect, restrictTo('admin'));
 
-// Routes for handling subject operations
 router.route("/")
-  .post(createYearGroup)
+  .post(validationFunction(yearGroupValidationSchema), createYearGroup)
   .get(getAllYearGroups);
 
 router.route("/:id")
   .get(getYearGroup)
-  .patch(updateYearGroup)
+  .patch(validationFunction(yearGroupUpdateSchema), updateYearGroup)
   .delete(deleteYearGroup);
 
 module.exports = router;

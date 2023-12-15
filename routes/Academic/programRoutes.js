@@ -8,19 +8,21 @@ const {
   deleteProgram
 } = require("../../controllers/Academic/ProgramsController");
 
+const { programValidationSchema, programUpdateSchema } = require("../../validation/academics/programValidation");
+
+const validation = require("../../middleware/validationFunction");
+
 const router = express.Router();
 
-// Middleware for protecting and restricting routes
 router.use(protect, restrictTo('admin'));
 
-// Routes for handling program operations
 router.route("/")
-  .post(createProgram)
+  .post(validation(programValidationSchema), createProgram)
   .get(getAllPrograms);
 
 router.route("/:id")
   .get(getProgram)
-  .patch(updateProgram)
+  .patch(validation(programUpdateSchema), updateProgram)
   .delete(deleteProgram);
 
 module.exports = router;

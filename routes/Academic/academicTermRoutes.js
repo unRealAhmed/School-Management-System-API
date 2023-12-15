@@ -7,21 +7,22 @@ const {
   updateAcademicTerm,
   deleteAcademicTerm,
 } = require("../../controllers/Academic/academicTermController");
+const validationFunction = require('../../middleware/validationFunction');
+const { academicTermValidationSchema, academicTermUpdateSchema } = require('../../validation/academics/academicTermValidation');
 
 const router = express.Router();
 
-router.use(protect, restrictTo("admin"))
+router.use(protect, restrictTo("admin"));
 
 router
   .route("/")
-  .post(createAcademicTerm)
+  .post(validationFunction(academicTermValidationSchema), createAcademicTerm)
   .get(getAcademicTerms);
 
 router
   .route("/:id")
   .get(getAcademicTerm)
-  .patch(updateAcademicTerm)
+  .patch(validationFunction(academicTermUpdateSchema), updateAcademicTerm)
   .delete(deleteAcademicTerm);
-
 
 module.exports = router;

@@ -7,18 +7,19 @@ const {
   updateExam,
 } = require("../../controllers/Academic/examsController");
 
+const { examValidationSchema, examUpdateSchema } = require("../../validation/academics/examValidation");
+const validationFunction = require("../../middleware/validationFunction");
+
 const router = express.Router();
 
-// Middleware for authentication and role restriction to 'teacher'
 router.use(protect, restrictTo('teacher'));
 
-
 router.route("/")
-  .post(createExam)
+  .post(validationFunction(examValidationSchema), createExam)
   .get(getAllExams);
 
 router.route("/:id")
   .get(getExam)
-  .patch(updateExam);
+  .patch(validationFunction(examUpdateSchema), updateExam);
 
 module.exports = router;
